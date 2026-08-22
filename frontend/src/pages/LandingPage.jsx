@@ -143,12 +143,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="landing__section landing__section--white">
-        <h2>Four kinds of queue, one system.</h2>
-        <p className="landing__section-lede">
-          Pick your sector at setup. NoQ brings the right service list, the right document rules and the right tone of
-          instruction for the people waiting.
-        </p>
+     <section className="landing__section landing__section--white">
+  <div className="landing__section-inner">
+    <h2>Four kinds of queue, one system.</h2>
+
+    <p className="landing__section-lede">
+      Pick your sector at setup. NoQ brings the right service list, the right
+      document rules and the right tone of instruction for the people waiting.
+    </p>
         <div className="landing__sector-grid">
           {SECTORS.map((s) => (
             <article className="landing__sector-card" key={s.title}>
@@ -158,6 +160,7 @@ export default function LandingPage() {
               <div className="landing__sector-note">{s.note}</div>
             </article>
           ))}
+        </div>
         </div>
       </section>
 
