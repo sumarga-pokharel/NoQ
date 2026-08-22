@@ -10,16 +10,15 @@ import counterRoutes from './routes/counterRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 import publicRoutes from './routes/publicRoutes.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
+import { clientOrigins, trustProxy } from './config/env.js';
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
-  .split(',')
-  .map((o) => o.trim());
+if (trustProxy) app.set('trust proxy', trustProxy);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: clientOrigins,
     credentials: true,
   })
 );

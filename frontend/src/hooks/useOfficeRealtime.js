@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
-
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.origin
+import { SOCKET_PATH, SOCKET_URL } from '../config/runtime'
 
 export function useOfficeRealtime(officeId, onUpdate) {
   useEffect(() => {
     if (!officeId || !onUpdate) return undefined
 
     const socket = io(SOCKET_URL, {
+      path: SOCKET_PATH,
       transports: ['websocket', 'polling'],
       reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 10000,
     })
 
     const joinOffice = () => socket.emit('office:join', officeId)

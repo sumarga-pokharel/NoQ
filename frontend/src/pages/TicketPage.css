@@ -150,6 +150,59 @@
   margin: 0 0 12px;
 }
 
+.ticket__retry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--color-alert-bg);
+  color: var(--color-alert-fg);
+  font-size: 13px;
+}
+
+.ticket__location-status {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px !important;
+  color: var(--color-green) !important;
+  font-size: 12px !important;
+}
+
+.ticket__location-error {
+  color: #a33a2b !important;
+}
+
+.ticket__leave-by {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  margin-bottom: 12px;
+  color: var(--color-green);
+  background: var(--color-green-wash);
+  border-radius: 10px;
+}
+
+.ticket__leave-by strong {
+  font-size: 18px;
+}
+
+.ticket__leave-by span,
+.ticket__route-warning {
+  font-size: 12px;
+}
+
+.ticket__leave-by--now {
+  color: #8a3e24;
+  background: #fff0e8;
+}
+
+.ticket__travel-body .btn + .btn {
+  margin-top: 10px;
+}
+
 .ticket__leave-by {
   padding: 14px;
   background: var(--color-warn-bg);
@@ -199,6 +252,21 @@
   border-radius: 12px;
   font-size: 13.5px;
   color: var(--color-body-2);
+}
+
+.ticket__offline > div {
+  display: grid;
+  gap: 2px;
+}
+
+.ticket__offline strong {
+  font-size: 13.5px;
+  color: var(--color-ink);
+}
+
+.ticket__offline span:not(.dot) {
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .ticket__offline .dot {

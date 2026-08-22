@@ -17,10 +17,14 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.provider = await Provider.findById(decoded.id);
+    req.provider = await Provider.findById(decoded.id).select('+tokenVersion');
     if (!req.provider) {
       res.status(401);
       throw new Error('Provider account no longer exists');
+    }
+    if ((decoded.version || 0) !== (req.provider.tokenVersion || 0)) {
+      res.status(401);
+      throw new Error('Session is no longer valid');
     }
     next();
   } catch (err) {

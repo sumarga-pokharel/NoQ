@@ -1,0 +1,8 @@
+.async-state { display: grid; justify-items: center; gap: 8px; padding: 28px 20px; border: 1px dashed var(--color-border-strong); border-radius: 14px; text-align: center; color: var(--color-body-2); }
+.async-state strong { color: var(--color-ink); }
+.async-state p { max-width: 460px; margin: 0; color: var(--color-muted); font-size: 13.5px; line-height: 1.5; }
+.async-state__spinner { width: 24px; height: 24px; border: 3px solid var(--color-border); border-top-color: var(--color-green); border-radius: 50%; animation: async-state-spin 0.75s linear infinite; }
+.async-state[data-tone='dark'] { border-color: rgba(255, 255, 255, 0.25); color: #fff; }
+.async-state[data-tone='dark'] strong, .async-state[data-tone='dark'] p { color: #fff; }
+@keyframes async-state-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .async-state__spinner { animation: none; } }

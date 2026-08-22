@@ -165,6 +165,21 @@
   accent-color: var(--color-green);
 }
 
+.join__toggle-row:has(input:disabled) {
+  cursor: not-allowed;
+  background: #fafbfa;
+}
+
+.join__notification-granted {
+  border-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 7%, transparent);
+}
+
+.join__notification-denied {
+  border-color: var(--color-alert-fg);
+  background: color-mix(in srgb, var(--color-alert-fg) 6%, transparent);
+}
+
 .join__phone-input {
   display: flex;
   align-items: center;

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import FormError from '../components/FormError'
 import './auth-forms.css'
 
 const SECTORS = [
@@ -33,7 +34,7 @@ export default function SignupPage() {
       await signup({ officeName, sector, email, phone, password })
       navigate('/setup', { replace: true })
     } catch (err) {
-      setError(err.message)
+      setError(err)
     } finally {
       setSubmitting(false)
     }
@@ -44,7 +45,7 @@ export default function SignupPage() {
       <h1>Set up your counter</h1>
       <p className="auth-form__lede">Three minutes, no hardware to buy. Free under 60 tokens a day.</p>
 
-      {error && <div className="auth-form__error">{error}</div>}
+      <FormError error={error} />
 
       <div className="field">
         <label htmlFor="officeName">Office / branch name</label>

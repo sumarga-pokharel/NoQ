@@ -22,6 +22,15 @@
   margin-bottom: 16px;
 }
 
+.auth-form__notice {
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  background: var(--color-warn-bg);
+  color: var(--color-warn-fg);
+  font-size: 13.5px;
+}
+
 .auth-form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -40,6 +49,28 @@
   text-align: center;
   font-size: 14px;
   color: var(--color-body-2);
+}
+
+.auth-form__forgot {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+}
+
+.account-page {
+  display: grid;
+  gap: 24px;
+  max-width: 640px;
+}
+
+.account-page h1,
+.account-page h2,
+.account-page p {
+  margin-top: 0;
+}
+
+.account-page__form {
+  padding: 24px;
 }
 
 @media (max-width: 420px) {

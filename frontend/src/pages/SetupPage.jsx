@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import FormError from '../components/FormError'
 import './SetupPage.css'
 
 const SECTORS = [
@@ -58,7 +59,7 @@ export default function SetupPage() {
       await completeOnboarding({ sector, services, requiredDocuments: docs })
       navigate('/dashboard')
     } catch (err) {
-      setSaveError(err.message)
+      setSaveError(err)
     } finally {
       setSaving(false)
     }
@@ -183,7 +184,7 @@ export default function SetupPage() {
         )}
 
         <div className="setup__actions">
-          {saveError && <span role="alert">{saveError}</span>}
+          <FormError error={saveError} />
           <button type="button" className="btn btn-ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
             Back
           </button>

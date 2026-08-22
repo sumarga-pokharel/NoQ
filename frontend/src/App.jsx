@@ -12,6 +12,9 @@ import SetupPage from './pages/SetupPage'
 import DashboardPage from './pages/DashboardPage'
 import DisplayPage from './pages/DisplayPage'
 import NotFoundPage from './pages/NotFoundPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import AccountPage from './pages/AccountPage'
 
 export default function App() {
   return (
@@ -26,11 +29,14 @@ export default function App() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
       </Route>
 
       <Route element={<RequireAuth><ProviderLayout /></RequireAuth>}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/setup" element={<SetupPage />} />
+        <Route path="/account" element={<AccountPage />} />
       </Route>
 
       <Route path="/display" element={<DisplayPage />} />

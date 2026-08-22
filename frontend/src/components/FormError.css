@@ -1,0 +1,24 @@
+.form-error {
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: var(--color-alert-bg);
+  color: var(--color-alert-fg);
+  font-size: 13.5px;
+}
+
+.form-error strong {
+  display: block;
+}
+
+.form-error ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.form-error li + li {
+  margin-top: 3px;
+}
+
+.auth-form > .form-error {
+  margin-bottom: 16px;
+}

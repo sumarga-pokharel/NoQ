@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import FormError from '../components/FormError'
 import './auth-forms.css'
 
 export default function LoginPage() {
@@ -24,7 +25,7 @@ export default function LoginPage() {
       await login({ email, password })
       navigate(location.state?.from || '/dashboard', { replace: true })
     } catch (err) {
-      setError(err.message)
+      setError(err)
     } finally {
       setSubmitting(false)
     }
@@ -35,7 +36,8 @@ export default function LoginPage() {
       <h1>Log in to your office</h1>
       <p className="auth-form__lede">Manage counters, services and your queue.</p>
 
-      {error && <div className="auth-form__error">{error}</div>}
+      {location.state?.authReason === 'expired' && <div className="auth-form__notice" role="status">Your session expired. Log in again to continue where you left off.</div>}
+      <FormError error={error} />
 
       <div className="field">
         <label htmlFor="email">Work email</label>
@@ -50,6 +52,8 @@ export default function LoginPage() {
       <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
         {submitting ? 'Logging in…' : 'Log in'}
       </button>
+
+      <p className="auth-form__forgot"><Link to="/forgot-password">Forgot your password?</Link></p>
 
       <p className="auth-form__switch">
         New to NoQ? <Link to="/signup">Set up your counter</Link>

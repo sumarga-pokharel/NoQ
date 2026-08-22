@@ -43,8 +43,18 @@ JWT_SECRET=<any long random string — e.g. output of `openssl rand -hex 32`>
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
+For traffic-aware travel and “leave by” estimates, enable Google Routes API
+and set `GOOGLE_MAPS_API_KEY`. Optional routing settings are documented in
+`.env.example`. Without a key, development uses a labeled straight-line
+estimate instead of live traffic.
+
 Leave the Twilio variables blank for now — SMS reminders will just log to the
 console instead of actually sending until you add real Twilio credentials.
+
+To enable SMS delivery, set `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN`, then
+configure either `TWILIO_MESSAGING_SERVICE_SID` (recommended for a Messaging
+Service) or `TWILIO_FROM_NUMBER`. Phone numbers are stored and sent in E.164
+format; local numbers use `SMS_DEFAULT_COUNTRY_CODE=+977` by default.
 
 ---
 
@@ -73,6 +83,16 @@ npm run seed
 Creates a demo government office ("Ward 16 Office, Lalitpur") with 3 services,
 3 counters and 2 required documents, and prints the login email/password and
 the public join-link slug it generated.
+
+### Run the end-to-end integration suite
+
+```bash
+pnpm test
+```
+
+The suite starts a fresh in-memory MongoDB instance and exercises the Express
+API over HTTP. It does not read or modify the development or production
+database. The first run downloads the MongoDB test binary; later runs reuse it.
 
 ---
 
@@ -110,6 +130,40 @@ socket.emit('office:join', officeId) // officeId = provider._id, from /api/publi
 socket.on('queue:update', (snapshot) => { /* refresh dashboard/board state */ })
 socket.on('ticket:update', (ticket) => { /* refresh a single visitor's ticket page */ })
 ```
+
+### Production API and Socket.IO configuration
+
+NoQ supports two deployment layouts:
+
+1. **Same origin through a reverse proxy** (recommended): serve the frontend at
+   `https://noq.example.com`, proxy `/api` and `/socket.io` to the backend, keep
+   `VITE_API_URL=/api`, and leave `VITE_SOCKET_URL` empty.
+2. **Split origins**: serve the frontend and backend separately. Build the
+   frontend with `VITE_API_URL=https://api.example.com/api` and
+   `VITE_SOCKET_URL=https://api.example.com`. Set backend
+   `CLIENT_ORIGIN=https://app.example.com`.
+
+Production backend example:
+
+```env
+NODE_ENV=production
+PORT=5000
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=<at-least-32-random-characters>
+CLIENT_ORIGIN=https://app.example.com
+SOCKET_PATH=/socket.io
+TRUST_PROXY=1
+```
+
+Multiple frontend deployments can be allowed with an exact comma-separated
+list, for example `CLIENT_ORIGIN=https://app.example.com,https://admin.example.com`.
+Do not include paths or use `*`. `VITE_*` variables are embedded during the
+frontend build, so rebuild the frontend after changing them. The browser URL
+must use HTTPS in production; Socket.IO will then connect over secure WSS.
+
+Your reverse proxy must forward WebSocket upgrade headers for `/socket.io` and
+must preserve the Socket.IO path configured by both `SOCKET_PATH` and
+`VITE_SOCKET_PATH`. `/api/health` can be used for platform health checks.
 
 ---
 
@@ -153,10 +207,12 @@ socket.on('ticket:update', (ticket) => { /* refresh a single visitor's ticket pa
 - **Push notifications**: `pushSubscription` is stored on the ticket already;
   wire up the Web Push API (VAPID keys) server-side to actually send them —
   currently only the data model and the `notifyBrowser` flag exist.
-- **SMS**: `utils/sms.js` logs to console until you `npm install twilio` and
-  fill in the `TWILIO_*` env vars.
+- **SMS**: `utils/sms.js` logs a masked simulation until the `TWILIO_*`
+  environment variables are configured. Delivery alerts are deduplicated on
+  each ticket for join, near-turn, and called events.
 - **Travel-time ETA**: `PATCH /tickets/:id/location` stores the visitor's
-  coordinates; combine with a maps/directions API (e.g. Google Distance
+  coordinates while the visitor explicitly shares them from the ticket page;
+  combine with a maps/directions API (e.g. Google Distance
   Matrix, OpenRouteService) to turn that into the "leave by" time shown on
   `TicketPage`.
 - **Daily reset**: token numbering already resets automatically each day

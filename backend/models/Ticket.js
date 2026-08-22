@@ -31,13 +31,28 @@ const ticketSchema = new mongoose.Schema(
     phone: { type: String, trim: true, default: '' },
     notifyBrowser: { type: Boolean, default: false },
     notifySms: { type: Boolean, default: false },
+    smsJoinSentAt: Date,
+    smsNearSentAt: Date,
+    smsCalledSentAt: Date,
     pushSubscription: { type: mongoose.Schema.Types.Mixed, default: null },
 
     // Optional live location for "time to get here" estimate
     consumerLocation: {
       lat: Number,
       lng: Number,
+      accuracy: Number,
       updatedAt: Date,
+    },
+    travelEstimate: {
+      durationMinutes: Number,
+      distanceMeters: Number,
+      source: String,
+      travelMode: String,
+      updatedAt: Date,
+      originLat: Number,
+      originLng: Number,
+      destinationLat: Number,
+      destinationLng: Number,
     },
 
     heldAt: Date, // "hold my place" - pauses auto-skip without losing position

@@ -11,6 +11,9 @@ const providerSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     phone: { type: String, trim: true },
     password: { type: String, required: true, minlength: 6, select: false },
+    tokenVersion: { type: Number, default: 0, select: false },
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
 
     address: { type: String, trim: true },
     location: {
