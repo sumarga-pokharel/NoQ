@@ -1,0 +1,31 @@
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 60px;
+  background: var(--color-page);
+}
+
+.auth-shell__brand {
+  margin-bottom: 36px;
+}
+
+.auth-shell__panel {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 36px 34px 32px;
+}
+
+.auth-shell__back {
+  margin-top: 26px;
+  font-size: 13.5px;
+}
+
+.auth-shell__back a {
+  color: var(--color-muted);
+}

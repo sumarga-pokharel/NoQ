@@ -1,0 +1,82 @@
+.noq-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.noq-logo__mark {
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+
+.noq-logo--sm .noq-logo__mark {
+  width: 20px;
+  height: 20px;
+}
+
+.noq-logo--lg .noq-logo__mark {
+  width: 36px;
+  height: 36px;
+}
+
+.noq-logo__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 74%;
+  height: 74%;
+  border-radius: 50%;
+  border: 4px solid var(--color-green);
+  box-sizing: border-box;
+}
+
+.noq-logo--reversed .noq-logo__ring {
+  border-color: #fff;
+}
+
+.noq-logo__dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 34%;
+  height: 34%;
+  border-radius: 50%;
+  background: var(--color-coral);
+}
+
+.noq-logo__wordwrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.noq-logo__word {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-green);
+  line-height: 1;
+}
+
+.noq-logo--reversed .noq-logo__word {
+  color: #fff;
+}
+
+.noq-logo--lg .noq-logo__word {
+  font-size: 30px;
+}
+
+.noq-logo__tag {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.noq-logo--reversed .noq-logo__tag {
+  color: #a8c4b7;
+}
