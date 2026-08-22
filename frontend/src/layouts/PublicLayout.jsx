@@ -18,6 +18,7 @@ export default function PublicLayout() {
           <NavLink to="/" end>
             Home
           </NavLink>
+          <NavLink to="/browse">Browse services</NavLink>
           <NavLink to="/join">Join a queue</NavLink>
         </nav>
 

@@ -39,11 +39,16 @@ export default function JoinPage() {
         setOffice(data.office)
         setServices(data.services)
         setError('')
-        setServiceId((current) => data.services.some((service) => service._id === current) ? current : data.services[0]?._id || '')
+        const preselected = searchParams.get('service')
+        setServiceId((current) => {
+          if (data.services.some((service) => service._id === preselected)) return preselected
+          if (data.services.some((service) => service._id === current)) return current
+          return data.services[0]?._id || ''
+        })
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [officeSlug])
+  }, [officeSlug, searchParams])
   useEffect(() => {
     loadOffice()
   }, [loadOffice])
