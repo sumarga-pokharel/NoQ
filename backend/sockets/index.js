@@ -21,12 +21,19 @@ export const initSockets = (io) => {
   });
 };
 
-export const emitQueueUpdate = (providerId, payload) => {
+export const emitQueueUpdate = (providerId, _payload) => {
   if (!ioInstance) return;
-  ioInstance.to(`office:${providerId}`).emit('queue:update', payload);
+  ioInstance.to(`office:${providerId}`).emit('queue:update', {
+    officeId: providerId.toString(),
+    changedAt: new Date().toISOString(),
+  });
 };
 
 export const emitTicketUpdate = (providerId, ticket) => {
   if (!ioInstance) return;
-  ioInstance.to(`office:${providerId}`).emit('ticket:update', ticket);
+  ioInstance.to(`office:${providerId}`).emit('ticket:update', {
+    officeId: providerId.toString(),
+    ticketId: ticket?._id?.toString(),
+    changedAt: new Date().toISOString(),
+  });
 };

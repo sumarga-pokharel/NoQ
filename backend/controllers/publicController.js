@@ -184,7 +184,7 @@ export const getDisplayBoard = asyncHandler(async (req, res) => {
   const waitingCount = await Ticket.countDocuments({ provider: provider._id, status: 'waiting' });
 
   res.json({
-    office: { officeName: provider.officeName, sector: provider.sector },
+    office: { id: provider._id, officeName: provider.officeName, sector: provider.sector },
     counters,
     nextUp: waiting.map((t) => t.token),
     servingCount,
