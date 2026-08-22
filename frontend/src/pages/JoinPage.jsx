@@ -1,164 +1,110 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
+import { api } from '../lib/api'
 import './JoinPage.css'
 
-const SERVICES = [
-  { id: 'tax', name: 'Property tax payment', wait: 'about 8 min each' },
-  { id: 'rec', name: 'Recommendation letter', wait: 'about 5 min each' },
-  { id: 'birth', name: 'Birth / death registration', wait: 'about 12 min each' },
-  { id: 'land', name: 'Land ownership transfer', wait: 'about 20 min each' },
-]
-
-const DOCS = ['Citizenship certificate (original)', 'Photocopy of citizenship', "Last year's tax receipt"]
-
-let ticketSeed = 24
-
 export default function JoinPage() {
+  const { officeSlug: routeSlug } = useParams()
+  const [searchParams] = useSearchParams()
+  const officeSlug = routeSlug || searchParams.get('office') || import.meta.env.VITE_DEMO_OFFICE_SLUG
+  const [office, setOffice] = useState(null)
+  const [services, setServices] = useState([])
   const [step, setStep] = useState(1)
-  const [serviceId, setServiceId] = useState(SERVICES[0].id)
+  const [serviceId, setServiceId] = useState('')
   const [checked, setChecked] = useState(() => new Set())
   const [priority, setPriority] = useState(false)
   const [notifyBrowser, setNotifyBrowser] = useState(true)
   const [notifySms, setNotifySms] = useState(false)
   const [phone, setPhone] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const { isNp } = useLanguage()
   const navigate = useNavigate()
 
-  const service = SERVICES.find((s) => s.id === serviceId)
+  useEffect(() => {
+    if (!officeSlug) {
+      setError('Open a valid office join link to continue.')
+      setLoading(false)
+      return
+    }
+    api(`/public/offices/${officeSlug}`)
+      .then((data) => {
+        setOffice(data.office)
+        setServices(data.services)
+        setServiceId(data.services[0]?._id || '')
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [officeSlug])
 
-  const toggleDoc = (doc) => {
-    setChecked((prev) => {
-      const next = new Set(prev)
-      if (next.has(doc)) next.delete(doc)
-      else next.add(doc)
-      return next
-    })
+  const selectedService = services.find((service) => service._id === serviceId)
+  const docs = office?.requiredDocuments || []
+  const toggleDoc = (name) => setChecked((current) => {
+    const next = new Set(current)
+    if (next.has(name)) next.delete(name)
+    else next.add(name)
+    return next
+  })
+
+  const submit = async () => {
+    setSubmitting(true)
+    setError('')
+    try {
+      const result = await api(`/public/offices/${officeSlug}/tickets`, {
+        method: 'POST',
+        body: {
+          serviceId,
+          priority,
+          documents: docs.map((doc) => ({ name: doc.name, confirmed: checked.has(doc.name) })),
+          phone: notifySms ? phone : '',
+          notifyBrowser,
+          notifySms,
+        },
+      })
+      navigate(`/ticket/${result.ticket._id}`)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const submit = () => {
-    ticketSeed += 1
-    const token = `B-${ticketSeed}`
-    navigate(`/ticket/${token}`, {
-      state: {
-        token,
-        service: service.name,
-        office: 'Ward 16 Office, Lalitpur',
-        ahead: 6,
-        priority,
-      },
-    })
-  }
+  if (loading) return <main className="join"><p>Loading office…</p></main>
 
   return (
     <main className="join">
       <div className="join__intro">
-        <div className="eyebrow">Ward 16 Office, Lalitpur</div>
+        <div className="eyebrow">{office?.officeName || 'NoQ'}</div>
         <h1>{isNp ? 'लाइनमा जोडिनुहोस्' : 'Join the queue'}</h1>
-        <p>
-          {isNp
-            ? 'तपाईंले मुख्य ढोकाको QR स्क्यान गर्नुभयो। तल तपाईंको सेवा र कागजातहरू भर्नुहोस्।'
-            : 'This mirrors the QR you would scan at the gate. Pick a service, confirm your documents, and get a live number.'}
-        </p>
+        <p>{office?.address || 'Choose a service, confirm your documents, and get a live number.'}</p>
       </div>
-
       <div className="card join__card">
-        <div className="join__steps">
-          {[1, 2, 3].map((n) => (
-            <span key={n} className={`join__step ${step >= n ? 'on' : ''}`}>
-              {n}
-            </span>
-          ))}
-        </div>
-
-        {step === 1 && (
-          <>
+        {error && <div role="alert" className="auth-form__error">{error}</div>}
+        {!office ? <p>This office could not be loaded.</p> : !office.isAcceptingJoins ? <p>This office has paused new joins.</p> : <>
+          <div className="join__steps">{[1, 2].map((n) => <span key={n} className={`join__step ${step >= n ? 'on' : ''}`}>{n}</span>)}</div>
+          {step === 1 && <>
             <h2>What do you need today?</h2>
-            <div className="join__service-list">
-              {SERVICES.map((s) => (
-                <label key={s.id} className={`join__service ${serviceId === s.id ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="service"
-                    checked={serviceId === s.id}
-                    onChange={() => setServiceId(s.id)}
-                  />
-                  <span className="join__service-radio" aria-hidden="true" />
-                  <span>
-                    <div className="join__service-name">{s.name}</div>
-                    <div className="join__service-wait">{s.wait}</div>
-                  </span>
-                </label>
-              ))}
-            </div>
-            <button type="button" className="btn btn-primary btn-block" onClick={() => setStep(2)}>
-              Continue
-            </button>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
+            <div className="join__service-list">{services.map((service) => (
+              <label key={service._id} className={`join__service ${serviceId === service._id ? 'selected' : ''}`}>
+                <input type="radio" name="service" checked={serviceId === service._id} onChange={() => setServiceId(service._id)} />
+                <span className="join__service-radio" aria-hidden="true" />
+                <span><div className="join__service-name">{service.name}</div><div className="join__service-wait">about {service.avgMinutes} min each</div></span>
+              </label>
+            ))}</div>
+            <button type="button" className="btn btn-primary btn-block" disabled={!selectedService} onClick={() => setStep(2)}>Continue</button>
+          </>}
+          {step === 2 && <>
             <h2>Bring these with you</h2>
-            <div className="join__docs">
-              {DOCS.map((doc) => (
-                <label key={doc} className="join__doc">
-                  <input type="checkbox" checked={checked.has(doc)} onChange={() => toggleDoc(doc)} />
-                  {doc}
-                </label>
-              ))}
-            </div>
-
-            <label className="join__toggle-row">
-              <div>
-                <div className="join__toggle-title">Do you need priority?</div>
-                <div className="join__toggle-sub">Senior citizens, pregnant women and people with disability.</div>
-              </div>
-              <input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} />
-            </label>
-
-            <label className="join__toggle-row">
-              <div>
-                <div className="join__toggle-title">Notify me in this browser</div>
-                <div className="join__toggle-sub">Free, works while this page is closed</div>
-              </div>
-              <input type="checkbox" checked={notifyBrowser} onChange={(e) => setNotifyBrowser(e.target.checked)} />
-            </label>
-
-            <label className="join__toggle-row">
-              <div>
-                <div className="join__toggle-title">Send me an SMS instead</div>
-                <div className="join__toggle-sub">Useful with no data connection</div>
-              </div>
-              <input type="checkbox" checked={notifySms} onChange={(e) => setNotifySms(e.target.checked)} />
-            </label>
-
-            {notifySms && (
-              <div className="field">
-                <label htmlFor="phone">Mobile number</label>
-                <div className="join__phone-input">
-                  <span>+977</span>
-                  <input
-                    id="phone"
-                    type="tel"
-                    placeholder="98XXXXXXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="join__actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>
-                Back
-              </button>
-              <button type="button" className="btn btn-primary btn-block" onClick={submit}>
-                Get my token
-              </button>
-            </div>
-          </>
-        )}
+            <div className="join__docs">{docs.map((doc) => <label key={doc._id || doc.name} className="join__doc"><input type="checkbox" checked={checked.has(doc.name)} onChange={() => toggleDoc(doc.name)} />{doc.name}</label>)}</div>
+            <label className="join__toggle-row"><div><div className="join__toggle-title">Do you need priority?</div><div className="join__toggle-sub">Senior citizens, pregnant women and people with disability.</div></div><input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} /></label>
+            <label className="join__toggle-row"><div><div className="join__toggle-title">Notify me in this browser</div></div><input type="checkbox" checked={notifyBrowser} onChange={(e) => setNotifyBrowser(e.target.checked)} /></label>
+            <label className="join__toggle-row"><div><div className="join__toggle-title">Send me an SMS</div></div><input type="checkbox" checked={notifySms} onChange={(e) => setNotifySms(e.target.checked)} /></label>
+            {notifySms && <div className="field"><label htmlFor="phone">Mobile number</label><input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>}
+            <div className="join__actions"><button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>Back</button><button type="button" className="btn btn-primary btn-block" onClick={submit} disabled={submitting}>{submitting ? 'Joining…' : 'Get my token'}</button></div>
+          </>}
+        </>}
       </div>
     </main>
   )

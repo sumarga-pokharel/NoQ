@@ -7,18 +7,27 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!email || !password) {
       setError('Enter your email and password to continue.')
       return
     }
-    login({ email })
-    navigate(location.state?.from || '/dashboard', { replace: true })
+    setError('')
+    setSubmitting(true)
+    try {
+      await login({ email, password })
+      navigate(location.state?.from || '/dashboard', { replace: true })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -38,13 +47,8 @@ export default function LoginPage() {
         <input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
 
-      <p className="auth-form__hint">
-        The backend isn&rsquo;t connected yet — logging in creates a local demo session in this browser so you can preview
-        the Dashboard and Setup screens.
-      </p>
-
-      <button type="submit" className="btn btn-primary btn-block">
-        Log in
+      <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+        {submitting ? 'Logging in…' : 'Log in'}
       </button>
 
       <p className="auth-form__switch">

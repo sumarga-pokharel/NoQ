@@ -17,17 +17,26 @@ export default function SignupPage() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const { signup } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!officeName || !email || !password) {
       setError('Fill in your office name, email and a password to continue.')
       return
     }
-    signup({ officeName, sector, email })
-    navigate('/setup', { replace: true })
+    setError('')
+    setSubmitting(true)
+    try {
+      await signup({ officeName, sector, email, phone, password })
+      navigate('/setup', { replace: true })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -74,13 +83,8 @@ export default function SignupPage() {
         <input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
 
-      <p className="auth-form__hint">
-        The backend isn&rsquo;t connected yet — this creates a local demo session in this browser so you can walk through
-        Setup and the Dashboard. Nothing is sent anywhere.
-      </p>
-
-      <button type="submit" className="btn btn-primary btn-block">
-        Create office account
+      <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+        {submitting ? 'Creating account…' : 'Create office account'}
       </button>
 
       <p className="auth-form__switch">

@@ -19,6 +19,7 @@ export default function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/join" element={<JoinPage />} />
+        <Route path="/join/:officeSlug" element={<JoinPage />} />
         <Route path="/ticket/:ticketId" element={<TicketPage />} />
       </Route>
 
@@ -27,26 +28,13 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
       </Route>
 
-      <Route element={<ProviderLayout />}>
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <DashboardPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/setup"
-          element={
-            <RequireAuth>
-              <SetupPage />
-            </RequireAuth>
-          }
-        />
+      <Route element={<RequireAuth><ProviderLayout /></RequireAuth>}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/setup" element={<SetupPage />} />
       </Route>
 
       <Route path="/display" element={<DisplayPage />} />
+      <Route path="/display/:officeSlug" element={<DisplayPage />} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

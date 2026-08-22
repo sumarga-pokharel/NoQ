@@ -29,7 +29,7 @@ export default function ProviderLayout() {
             Today&rsquo;s queue
           </NavLink>
           <NavLink to="/setup">Setup &amp; services</NavLink>
-          <NavLink to="/display" target="_blank" rel="noreferrer" className="provider-side__external">
+          <NavLink to={`/display/${provider?.slug || ''}`} target="_blank" rel="noreferrer" className="provider-side__external">
             Display board ↗
           </NavLink>
         </nav>

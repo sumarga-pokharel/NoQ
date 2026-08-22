@@ -1,66 +1,59 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { api } from '../lib/api'
 
-// NOTE: There is no backend wired up yet, so "authentication" here is a
-// local-only stand-in — it just remembers a provider profile in
-// localStorage so the Setup/Dashboard pages have something to gate on and
-// display. Swap this for real API calls (and a real token) once the
-// backend's auth routes exist.
-const STORAGE_KEY = 'noq.provider.session'
-
+const TOKEN_KEY = 'noq.auth.token'
 const AuthContext = createContext(null)
 
-function readSession() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [provider, setProvider] = useState(() => readSession())
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY))
+  const [provider, setProvider] = useState(null)
+  const [isLoading, setIsLoading] = useState(Boolean(token))
 
   useEffect(() => {
-    if (provider) localStorage.setItem(STORAGE_KEY, JSON.stringify(provider))
-    else localStorage.removeItem(STORAGE_KEY)
-  }, [provider])
+    if (!token) return
+    let active = true
+    api('/auth/me', { token })
+      .then(({ provider: profile }) => active && setProvider(profile))
+      .catch(() => {
+        if (!active) return
+        localStorage.removeItem(TOKEN_KEY)
+        setToken(null)
+      })
+      .finally(() => active && setIsLoading(false))
+    return () => { active = false }
+  }, [token])
 
-  const signup = ({ officeName, sector, email }) => {
-    const profile = {
-      officeName: officeName || 'Your office',
-      sector: sector || 'government',
-      email,
-      onboarded: false,
-    }
+  const establishSession = ({ token: nextToken, provider: profile }) => {
+    localStorage.setItem(TOKEN_KEY, nextToken)
+    setToken(nextToken)
     setProvider(profile)
     return profile
   }
 
-  const login = ({ email }) => {
-    const existing = readSession()
-    const profile = existing?.email === email ? existing : { officeName: 'Your office', sector: 'government', email, onboarded: true }
+  const signup = async (details) => establishSession(await api('/auth/signup', { method: 'POST', body: details }))
+  const login = async (credentials) => establishSession(await api('/auth/login', { method: 'POST', body: credentials }))
+  const completeOnboarding = async ({ sector, services, requiredDocuments }) => {
+    const result = await api('/provider/setup', { method: 'PUT', token, body: { sector, services, requiredDocuments } })
+    setProvider(result.provider)
+    return result
+  }
+  const updateProvider = async (updates) => {
+    const { provider: profile } = await api('/provider/me', { method: 'PUT', token, body: updates })
     setProvider(profile)
     return profile
   }
-
-  const completeOnboarding = (updates = {}) => {
-    setProvider((prev) => (prev ? { ...prev, ...updates, onboarded: true } : prev))
+  const logout = () => {
+    localStorage.removeItem(TOKEN_KEY)
+    setToken(null)
+    setProvider(null)
+    setIsLoading(false)
   }
 
-  const logout = () => setProvider(null)
-
-  return (
-    <AuthContext.Provider
-      value={{ provider, isAuthenticated: !!provider, signup, login, logout, completeOnboarding }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ token, provider, isAuthenticated: Boolean(provider), isLoading, signup, login, logout, completeOnboarding, updateProvider }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
+  const value = useContext(AuthContext)
+  if (!value) throw new Error('useAuth must be used within AuthProvider')
+  return value
 }

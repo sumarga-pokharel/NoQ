@@ -25,6 +25,8 @@ export default function SetupPage() {
   const [newService, setNewService] = useState({ name: '', minutes: '', prefix: '' })
   const [docs, setDocs] = useState(['Citizenship certificate (original)', 'Photocopy of citizenship'])
   const [newDoc, setNewDoc] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const addService = () => {
     if (!newService.name.trim()) return
@@ -49,9 +51,17 @@ export default function SetupPage() {
 
   const removeDoc = (doc) => setDocs((d) => d.filter((x) => x !== doc))
 
-  const finish = () => {
-    completeOnboarding({ sector })
-    navigate('/dashboard')
+  const finish = async () => {
+    setSaving(true)
+    setSaveError('')
+    try {
+      await completeOnboarding({ sector, services, requiredDocuments: docs })
+      navigate('/dashboard')
+    } catch (err) {
+      setSaveError(err.message)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -173,6 +183,7 @@ export default function SetupPage() {
         )}
 
         <div className="setup__actions">
+          {saveError && <span role="alert">{saveError}</span>}
           <button type="button" className="btn btn-ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
             Back
           </button>
@@ -181,8 +192,8 @@ export default function SetupPage() {
               Continue
             </button>
           ) : (
-            <button type="button" className="btn btn-primary" onClick={finish}>
-              Finish setup
+            <button type="button" className="btn btn-primary" onClick={finish} disabled={saving}>
+              {saving ? 'Publishing…' : 'Finish setup'}
             </button>
           )}
         </div>
