@@ -9,6 +9,7 @@ export function useTicketLocation(ticketId, ticketActive) {
   const [sharing, setSharing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [locationError, setLocationError] = useState('')
+  const [coords, setCoords] = useState(null)
 
   const stop = useCallback(() => {
     if (watchId.current !== null && navigator.geolocation) {
@@ -16,6 +17,7 @@ export function useTicketLocation(ticketId, ticketActive) {
     }
     watchId.current = null
     setSharing(false)
+    setCoords(null)
   }, [])
 
   const start = useCallback(() => {
@@ -28,14 +30,18 @@ export function useTicketLocation(ticketId, ticketActive) {
     setLocationError('')
     setSharing(true)
     watchId.current = navigator.geolocation.watchPosition(
-      async ({ coords }) => {
+      async ({ coords: position }) => {
+        // Reflected on the map on every reading; only throttled toward the
+        // server below so the visitor's pin still tracks smoothly between
+        // the periodic PATCH calls.
+        setCoords({ lat: position.latitude, lng: position.longitude })
         const now = Date.now()
         if (now - lastSentAt.current < UPDATE_INTERVAL_MS) return
         lastSentAt.current = now
         try {
           await api(`/public/tickets/${ticketId}/location`, {
             method: 'PATCH',
-            body: { lat: coords.latitude, lng: coords.longitude, accuracy: coords.accuracy },
+            body: { lat: position.latitude, lng: position.longitude, accuracy: position.accuracy },
           })
           setLastUpdated(new Date())
           setLocationError('')
@@ -70,5 +76,5 @@ export function useTicketLocation(ticketId, ticketActive) {
     }
   }, [ticketActive])
 
-  return { sharing, lastUpdated, locationError, start, stop }
+  return { sharing, coords, lastUpdated, locationError, start, stop }
 }

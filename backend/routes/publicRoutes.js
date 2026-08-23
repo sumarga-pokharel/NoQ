@@ -7,10 +7,12 @@ import {
   leaveQueue,
   updateLocation,
   getDisplayBoard,
+  getDirectory,
 } from '../controllers/publicController.js';
 
 const router = express.Router();
 
+router.get('/directory', getDirectory);
 router.get('/offices/:slug', getOfficeBySlug);
 router.post('/offices/:slug/tickets', joinQueue);
 router.get('/offices/:slug/display', getDisplayBoard);

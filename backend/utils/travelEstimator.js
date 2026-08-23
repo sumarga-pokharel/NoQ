@@ -14,8 +14,11 @@ const distanceMeters = (from, to) => {
   return 2 * earthRadius * Math.asin(Math.sqrt(a));
 };
 
-const parseDurationMinutes = (duration) => Math.max(1, Math.ceil(Number.parseFloat(duration) / 60));
-
+const parseDurationMinutes = (duration) => {
+  const seconds = Number.parseFloat(duration);
+  if (!Number.isFinite(seconds)) throw new Error('Google Routes returned an invalid duration');
+  return Math.max(1, Math.ceil(seconds / 60));
+};
 const fallbackEstimate = (origin, destination) => {
   const distance = Math.round(distanceMeters(origin, destination));
   const speedKph = Number(process.env.TRAVEL_FALLBACK_SPEED_KPH) || 20;
@@ -100,7 +103,7 @@ export const refreshTravelEstimate = async (ticket, provider) => {
 };
 
 export const buildLeaveByEstimate = (travelEstimate, queueEstimate, ticketStatus) => {
-  if (!travelEstimate) return null;
+  if (!travelEstimate || !Number.isFinite(travelEstimate.durationMinutes)) return null;
   const bufferMinutes = Number(process.env.ARRIVAL_BUFFER_MINUTES) || 5;
   const leaveInMinutes = Math.max(0, queueEstimate.min - travelEstimate.durationMinutes - bufferMinutes);
   const leaveNow = ['called', 'serving'].includes(ticketStatus) || leaveInMinutes === 0;

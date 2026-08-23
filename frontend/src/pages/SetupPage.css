@@ -242,8 +242,9 @@
   width: 96px;
   height: 96px;
   border-radius: 10px;
-  background: repeating-linear-gradient(0deg, #16201c 0 4px, transparent 4px 8px),
-    repeating-linear-gradient(90deg, #16201c 0 4px, #fff 4px 8px);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  object-fit: contain;
 }
 
 .setup__publish-office {

@@ -1,0 +1,37 @@
+.placeholder {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+.placeholder h1 {
+  font-family: var(--font-display);
+  margin: 6px 0 10px;
+}
+
+.placeholder p {
+  color: var(--color-body-2);
+  margin: 0 0 18px;
+}
+
+.placeholder ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-body);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.placeholder__card {
+  padding: 20px;
+}
+
+.placeholder__tag {
+  display: inline-block;
+  background: var(--color-warn-bg);
+  color: var(--color-warn-fg);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  margin-bottom: 12px;
+}

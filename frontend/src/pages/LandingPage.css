@@ -203,6 +203,11 @@
   margin-right: auto;
 }
 
+.landing__section--white {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
 .landing__section-lede {
   font-size: 16.5px;
   color: var(--color-body);

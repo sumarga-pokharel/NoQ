@@ -5,6 +5,10 @@ import AuthLayout from './layouts/AuthLayout'
 import ProviderLayout from './layouts/ProviderLayout'
 import LandingPage from './pages/LandingPage'
 import JoinPage from './pages/JoinPage'
+import BrowsePage from './pages/BrowsePage'
+import HelpPage from './pages/HelpPage'
+import NearbyPage from './pages/NearbyPage'
+import AnalyticsPage from './pages/AnalyticsPage'
 import TicketPage from './pages/TicketPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -21,6 +25,10 @@ export default function App() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/browse" element={<BrowsePage />} />
+        <Route path="/browse/:sector" element={<BrowsePage />} />
+        <Route path="/nearby" element={<NearbyPage />} />
+        <Route path="/help" element={<HelpPage />} />
         <Route path="/join" element={<JoinPage />} />
         <Route path="/join/:officeSlug" element={<JoinPage />} />
         <Route path="/ticket/:ticketId" element={<TicketPage />} />
@@ -37,6 +45,7 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </Route>
 
       <Route path="/display" element={<DisplayPage />} />

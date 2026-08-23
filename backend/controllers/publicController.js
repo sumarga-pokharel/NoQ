@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import Provider from '../models/Provider.js';
+import Provider, { SECTOR_VALUES } from '../models/Provider.js';
 import Service from '../models/Service.js';
 import Ticket from '../models/Ticket.js';
 import Counter from '../models/Counter.js';
@@ -223,5 +223,48 @@ export const getDisplayBoard = asyncHandler(async (req, res) => {
     nextUp: waiting.map((t) => t.token),
     servingCount,
     waitingCount,
+  });
+});
+
+// @desc  Public directory: offices grouped by sector, with their bookable services
+// @route GET /api/public/directory?sector=hospital
+export const getDirectory = asyncHandler(async (req, res) => {
+  const filter = {};
+  if (req.query.sector) filter.sector = req.query.sector;
+
+  const providers = await Provider.find(filter).select(
+    'officeName slug sector address location isAcceptingJoins requiredDocuments'
+  );
+
+  const services = await Service.find({
+    provider: { $in: providers.map((p) => p._id) },
+    isActive: true,
+  }).select('provider name category avgMinutes prefix isEmergency');
+
+  const byProvider = new Map();
+  services.forEach((service) => {
+    const key = String(service.provider);
+    if (!byProvider.has(key)) byProvider.set(key, []);
+    byProvider.get(key).push(service);
+  });
+
+  const offices = providers.map((provider) => ({
+    id: provider._id,
+    officeName: provider.officeName,
+    slug: provider.slug,
+    sector: provider.sector,
+    address: provider.address,
+    location: provider.location,
+    isAcceptingJoins: provider.isAcceptingJoins,
+    requiredDocuments: provider.requiredDocuments,
+    services: byProvider.get(String(provider._id)) || [],
+  }));
+
+  res.json({
+    sectors: SECTOR_VALUES.map((sector) => ({
+      sector,
+      officeCount: offices.filter((o) => o.sector === sector).length,
+    })),
+    offices,
   });
 });
