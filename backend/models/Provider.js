@@ -21,6 +21,11 @@ const providerSchema = new mongoose.Schema(
       lng: Number,
     },
 
+    // Office operating hours, 24h "HH:MM". Every office opens at 10:00 and
+    // closes at 17:00 unless the provider changes it in their profile.
+    openTime: { type: String, default: '10:00' },
+    closeTime: { type: String, default: '17:00' },
+
     // Documents required from every visitor before they can be marked "ready"
     requiredDocuments: [
       {
@@ -60,6 +65,10 @@ providerSchema.methods.toPublicJSON = function toPublicJSON() {
     phone: this.phone,
     address: this.address,
     location: this.location,
+    // Fallback covers documents saved before this field existed — every
+    // office shows 10:00-17:00 by default, not just ones created after.
+    openTime: this.openTime || '10:00',
+    closeTime: this.closeTime || '17:00',
     requiredDocuments: this.requiredDocuments,
     isAcceptingJoins: this.isAcceptingJoins,
     onboardingComplete: this.onboardingComplete,

@@ -39,6 +39,12 @@
   margin-top: 0.3vw;
 }
 
+.board__office-hours {
+  font-size: 1.1vw;
+  color: #8fa89c;
+  margin-top: 0.2vw;
+}
+
 .board__clock {
   text-align: right;
   white-space: nowrap;

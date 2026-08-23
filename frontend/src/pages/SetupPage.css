@@ -1,4 +1,17 @@
+.setup-center {
+  /* provider-main's own padding (28px top + 60px bottom, see
+     ProviderLayout.css) subtracted so this doesn't depend on percentage
+     height resolving through a flex-stretched ancestor with no explicit
+     height, which is inconsistent across browsers. */
+  min-height: calc(100vh - 88px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
 .setup {
+  width: 100%;
   max-width: 880px;
 }
 
@@ -104,6 +117,10 @@
   width: 32px;
   height: 32px;
   border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
 }
 
 .setup__sector-radio {
@@ -305,5 +322,16 @@
 
   .setup__add-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Below this, ProviderLayout stacks the sidebar above the content
+     instead of beside it, so "100vh minus the sidebar" no longer means
+     anything — let the page centre on its own content height instead of
+     forcing extra empty space. */
+  .setup-center {
+    min-height: auto;
+    padding: 12px 0;
   }
 }

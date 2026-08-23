@@ -26,3 +26,6 @@ dist-ssr
 
 
 .env
+
+# Scratch verification scripts, not part of the app
+.tmp-verify

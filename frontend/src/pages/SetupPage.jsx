@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { useAuth } from '../context/AuthContext'
 import FormError from '../components/FormError'
+import SectorIcon from '../components/SectorIcon'
 import { PUBLIC_URL } from '../config/runtime'
 import './SetupPage.css'
 
@@ -87,6 +88,7 @@ export default function SetupPage() {
   }
 
   return (
+    <div className="setup-center">
     <div className="setup">
       <div className="setup__stepper">
         {STEPS.map((label, i) => (
@@ -111,7 +113,9 @@ export default function SetupPage() {
                   onClick={() => setSector(s.id)}
                 >
                   <div className="setup__sector-top">
-                    <span className="setup__sector-swatch" style={{ background: s.color }} />
+                    <span className="setup__sector-swatch" style={{ background: s.color }}>
+                      <SectorIcon sector={s.id} size={18} />
+                    </span>
                     <span className="setup__sector-radio" />
                   </div>
                   <div className="setup__sector-title">{s.title}</div>
@@ -231,6 +235,7 @@ export default function SetupPage() {
           )}
         </div>
       </div>
+    </div>
     </div>
   )
 }

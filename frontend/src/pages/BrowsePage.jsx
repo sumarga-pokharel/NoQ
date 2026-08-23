@@ -4,6 +4,8 @@ import QRCode from 'qrcode'
 import { useLanguage } from '../context/LanguageContext'
 import { api } from '../lib/api'
 import AsyncState from '../components/AsyncState'
+import { formatHoursRange } from '../lib/formatHours'
+import { formatEstimateWindow } from '../lib/estimateWindow'
 import './BrowsePage.css'
 
 const SECTOR_LABELS = {
@@ -42,6 +44,16 @@ function ServiceQr({ office, service }) {
           {service.category ? `${service.category} · ` : ''}
           {service.prefix} · ~{service.avgMinutes} min
           {service.isEmergency ? ' · emergency' : ''}
+        </div>
+        <div className="browse__service-queue">
+          <strong>{service.ahead}</strong> {service.ahead === 1 ? 'person' : 'people'} ahead · about{' '}
+          {service.estimate?.min}–{service.estimate?.max} min wait
+          {service.estimate && (
+            <span className="browse__service-clock">
+              {' '}
+              (around {formatEstimateWindow(service.estimate.min, service.estimate.max)})
+            </span>
+          )}
         </div>
         <Link to={joinPath} className="btn btn-secondary btn-sm">
           Join this line
@@ -145,7 +157,12 @@ export default function BrowsePage() {
           <header className="browse__office-head">
             <div>
               <h2>{office.officeName}</h2>
-              <p>{office.address || '—'}</p>
+              <p>
+                {office.address || '—'}
+                {office.openTime && office.closeTime && (
+                  <span className="browse__office-hours"> · {formatHoursRange(office.openTime, office.closeTime)}</span>
+                )}
+              </p>
             </div>
             <span className={`browse__badge ${office.isAcceptingJoins ? '' : 'browse__badge--off'}`}>
               {office.isAcceptingJoins ? 'Open' : 'Paused'}

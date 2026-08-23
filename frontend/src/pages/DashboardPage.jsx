@@ -7,6 +7,7 @@ import FormError from "../components/FormError";
 import AsyncState from "../components/AsyncState";
 import { PUBLIC_URL } from "../config/runtime";
 import { composeQrPoster } from "../lib/qrPoster";
+import { formatHoursRange } from "../lib/formatHours";
 import "./DashboardPage.css";
 
 const HOURS = [22, 48, 86, 100, 71, 34, 52, 63, 29, 14];
@@ -519,6 +520,8 @@ export default function DashboardPage() {
       phone: provider.phone || "",
       lat: provider.location?.lat ?? "",
       lng: provider.location?.lng ?? "",
+      openTime: provider.openTime || "10:00",
+      closeTime: provider.closeTime || "17:00",
     });
   };
 
@@ -584,6 +587,8 @@ export default function DashboardPage() {
               lng: Number(profileForm.lng),
             }
           : null,
+        openTime: profileForm.openTime,
+        closeTime: profileForm.closeTime,
       });
 
       setProfileForm(null);
@@ -638,7 +643,7 @@ export default function DashboardPage() {
           <h1>Today&rsquo;s queue</h1>
           <p>
             {provider.officeName} · {data.waitingCount} waiting
-            right now
+            right now · {formatHoursRange(provider.openTime, provider.closeTime)}
           </p>
         </div>
 
@@ -1272,6 +1277,34 @@ export default function DashboardPage() {
                   }))
                 }
                 placeholder="85.3240"
+              />
+            </label>
+
+            <label className="field">
+              Opens at
+              <input
+                type="time"
+                value={profileForm.openTime}
+                onChange={(event) =>
+                  setProfileForm((current) => ({
+                    ...current,
+                    openTime: event.target.value,
+                  }))
+                }
+              />
+            </label>
+
+            <label className="field">
+              Closes at
+              <input
+                type="time"
+                value={profileForm.closeTime}
+                onChange={(event) =>
+                  setProfileForm((current) => ({
+                    ...current,
+                    closeTime: event.target.value,
+                  }))
+                }
               />
             </label>
           </div>

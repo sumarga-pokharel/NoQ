@@ -5,6 +5,7 @@ import { api } from "../lib/api";
 import { useOfficeRealtime } from "../hooks/useOfficeRealtime";
 import AsyncState from "../components/AsyncState";
 import { PUBLIC_URL } from "../config/runtime";
+import { formatHoursRange } from "../lib/formatHours";
 import "./DisplayPage.css";
 
 export default function DisplayPage() {
@@ -121,6 +122,11 @@ export default function DisplayPage() {
           <div className="board__office-en">
             {data.office.officeName}
           </div>
+          {data.office.openTime && data.office.closeTime && (
+            <div className="board__office-hours">
+              {formatHoursRange(data.office.openTime, data.office.closeTime)}
+            </div>
+          )}
         </div>
 
         <div className="board__clock">

@@ -98,6 +98,11 @@
   font-weight: 500;
 }
 
+.ticket__wait-clock {
+  font-size: 13px;
+  color: var(--color-body-2);
+}
+
 .ticket__wait-bar {
   height: 7px;
   border-radius: 4px;

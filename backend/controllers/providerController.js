@@ -3,6 +3,13 @@ import Service from '../models/Service.js';
 import { SECTOR_VALUES } from '../models/Provider.js';
 import { emitQueueUpdate } from '../sockets/index.js';
 
+const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+const toMinutes = (hhmm) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
+
 const normalizeDocuments = (documents) => {
   if (!Array.isArray(documents)) {
     const error = new Error('requiredDocuments must be an array');
@@ -35,7 +42,7 @@ const normalizeDocuments = (documents) => {
 // @route PUT /api/provider/me
 // @access Private
 export const updateProfile = asyncHandler(async (req, res) => {
-  const { officeName, address, location, phone, isAcceptingJoins } = req.body;
+  const { officeName, address, location, phone, isAcceptingJoins, openTime, closeTime } = req.body;
 
   if (officeName !== undefined) {
     const name = String(officeName).trim();
@@ -83,6 +90,25 @@ export const updateProfile = asyncHandler(async (req, res) => {
     req.provider.phone = cleanPhone;
   }
   if (isAcceptingJoins !== undefined) req.provider.isAcceptingJoins = isAcceptingJoins;
+
+  if (openTime !== undefined || closeTime !== undefined) {
+    const nextOpen = openTime !== undefined ? String(openTime).trim() : req.provider.openTime || '10:00';
+    const nextClose = closeTime !== undefined ? String(closeTime).trim() : req.provider.closeTime || '17:00';
+    if (!TIME_RE.test(nextOpen) || !TIME_RE.test(nextClose)) {
+      res.status(400);
+      const error = new Error('Office hours must be in 24h HH:MM format');
+      error.fields = { openTime: error.message };
+      throw error;
+    }
+    if (toMinutes(nextClose) <= toMinutes(nextOpen)) {
+      res.status(400);
+      const error = new Error('Closing time must be after opening time');
+      error.fields = { closeTime: error.message };
+      throw error;
+    }
+    req.provider.openTime = nextOpen;
+    req.provider.closeTime = nextClose;
+  }
 
   await req.provider.save();
   res.json({ provider: req.provider.toPublicJSON() });

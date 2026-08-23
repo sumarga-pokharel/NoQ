@@ -218,7 +218,13 @@ export const getDisplayBoard = asyncHandler(async (req, res) => {
   const waitingCount = await Ticket.countDocuments({ provider: provider._id, status: 'waiting' });
 
   res.json({
-    office: { id: provider._id, officeName: provider.officeName, sector: provider.sector },
+    office: {
+      id: provider._id,
+      officeName: provider.officeName,
+      sector: provider.sector,
+      openTime: provider.openTime || '10:00',
+      closeTime: provider.closeTime || '17:00',
+    },
     counters,
     nextUp: waiting.map((t) => t.token),
     servingCount,
@@ -233,7 +239,7 @@ export const getDirectory = asyncHandler(async (req, res) => {
   if (req.query.sector) filter.sector = req.query.sector;
 
   const providers = await Provider.find(filter).select(
-    'officeName slug sector address location isAcceptingJoins requiredDocuments'
+    'officeName slug sector address location isAcceptingJoins requiredDocuments openTime closeTime'
   );
 
   const services = await Service.find({
@@ -241,11 +247,30 @@ export const getDirectory = asyncHandler(async (req, res) => {
     isActive: true,
   }).select('provider name category avgMinutes prefix isEmergency');
 
+  // Live "how many ahead / how long" per service, so a visitor can see
+  // this before joining, not just after — one grouped count instead of a
+  // query per service.
+  const waitingCounts = await Ticket.aggregate([
+    {
+      $match: {
+        provider: { $in: providers.map((p) => p._id) },
+        status: { $in: ['waiting', 'called'] },
+      },
+    },
+    { $group: { _id: '$service', count: { $sum: 1 } } },
+  ]);
+  const waitingByService = new Map(waitingCounts.map((w) => [String(w._id), w.count]));
+
   const byProvider = new Map();
   services.forEach((service) => {
     const key = String(service.provider);
     if (!byProvider.has(key)) byProvider.set(key, []);
-    byProvider.get(key).push(service);
+    const ahead = waitingByService.get(String(service._id)) || 0;
+    byProvider.get(key).push({
+      ...service.toObject(),
+      ahead,
+      estimate: estimateWaitRange(ahead, service.avgMinutes || 5),
+    });
   });
 
   const offices = providers.map((provider) => ({
@@ -255,6 +280,8 @@ export const getDirectory = asyncHandler(async (req, res) => {
     sector: provider.sector,
     address: provider.address,
     location: provider.location,
+    openTime: provider.openTime || '10:00',
+    closeTime: provider.closeTime || '17:00',
     isAcceptingJoins: provider.isAcceptingJoins,
     requiredDocuments: provider.requiredDocuments,
     services: byProvider.get(String(provider._id)) || [],

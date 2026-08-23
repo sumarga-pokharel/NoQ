@@ -47,7 +47,7 @@ export default function PublicLayout() {
         <div className="public-footer__inner">
           <div className="public-footer__brand">
             <Logo tagline={false} />
-            <p>Pulchowk, Lalitpur · hello@noq.com.np · 01-5970000</p>
+            <p>Madan Bhandari Memorial College, IdeaX Hackfest · Anamnagar, Kathmandu</p>
           </div>
           <div className="public-footer__cols">
             <div>

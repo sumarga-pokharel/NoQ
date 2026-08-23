@@ -233,6 +233,10 @@
   height: 34px;
   border-radius: 9px;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
 }
 
 .landing__sector-card h3 {

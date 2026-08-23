@@ -1,27 +1,32 @@
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
+import SectorIcon from '../components/SectorIcon'
 import './LandingPage.css'
 
 const SECTORS = [
   {
+    id: 'government',
     title: 'Government offices',
     note: 'Document checks built in',
     color: '#1b4d3e',
     desc: 'License renewal · New license · Citizenship · Passport · Land registration · Property tax',
   },
   {
+    id: 'hospital',
     title: 'Hospitals',
     note: 'Triage jumps the line',
     color: '#2a4c8f',
     desc: 'Emergency · General checkup · OPD by department · Lab & sample · Pharmacy · Follow-up',
   },
   {
+    id: 'bank',
     title: 'Banks',
     note: 'Multi-counter balancing',
     color: '#7a5210',
     desc: 'Account opening · Cash deposit · Remittance · Loan desk · Locker · KYC update',
   },
   {
+    id: 'other',
     title: 'Other services',
     note: 'Table & party size',
     color: '#8a3e52',
@@ -154,7 +159,9 @@ export default function LandingPage() {
         <div className="landing__sector-grid">
           {SECTORS.map((s) => (
             <article className="landing__sector-card" key={s.title}>
-              <div className="landing__sector-swatch" style={{ background: s.color }} />
+              <div className="landing__sector-swatch" style={{ background: s.color }}>
+                <SectorIcon sector={s.id} size={20} />
+              </div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
               <div className="landing__sector-note">{s.note}</div>
