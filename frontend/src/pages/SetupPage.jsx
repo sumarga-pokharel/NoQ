@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { useAuth } from '../context/AuthContext'
 import FormError from '../components/FormError'
+import { PUBLIC_URL } from '../config/runtime'
 import './SetupPage.css'
 
 const SECTORS = [
@@ -31,7 +32,7 @@ export default function SetupPage() {
   const [saveError, setSaveError] = useState('')
   const [qrDataUrl, setQrDataUrl] = useState('')
 
-  const publicJoinUrl = `${window.location.origin}/join/${provider?.slug || ''}`
+  const publicJoinUrl = `${PUBLIC_URL}/join/${provider?.slug || ''}`
 
   useEffect(() => {
     if (!provider?.slug) return undefined
@@ -190,15 +191,18 @@ export default function SetupPage() {
             <h1>Publish your QR</h1>
             <p className="setup__lede">The link never expires — the poster stays on the wall and picks up whatever you publish.</p>
             <div className="setup__publish">
-              {qrDataUrl ? (
-                <img
-                  className="setup__qr"
-                  src={qrDataUrl}
-                  alt={`QR code for ${provider?.officeName || 'your office'} queue`}
-                />
-              ) : (
-                <div className="setup__qr" aria-hidden="true" />
-              )}
+              <div className="setup__qr-block">
+                {qrDataUrl ? (
+                  <img
+                    className="setup__qr"
+                    src={qrDataUrl}
+                    alt={`QR code for ${provider?.officeName || 'your office'} queue`}
+                  />
+                ) : (
+                  <div className="setup__qr" aria-hidden="true" />
+                )}
+                <div className="setup__qr-caption">{provider?.officeName || 'Your office'}</div>
+              </div>
               <div>
                 <div className="setup__publish-office">{provider?.officeName || 'Your office'}</div>
                 <div className="setup__publish-url">{publicJoinUrl}</div>

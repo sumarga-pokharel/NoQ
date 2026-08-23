@@ -1,0 +1,92 @@
+services:
+  - type: web
+    name: noq-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: SOCKET_PATH
+        value: /socket.io
+      - key: SMS_DEFAULT_COUNTRY_CODE
+        value: "+977"
+      - key: ROUTES_TRAVEL_MODE
+        value: DRIVE
+      - key: ARRIVAL_BUFFER_MINUTES
+        value: "5"
+      - key: TRAVEL_FALLBACK_SPEED_KPH
+        value: "20"
+      # Filled in by you when the blueprint asks (or afterward in the
+      # Render dashboard → Environment). None of these have safe defaults.
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      # The deployed frontend's URL — you won't know this until after the
+      # frontend service below is created, so deploy backend first with a
+      # placeholder, then come back and set the real one once you have it.
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_MESSAGING_SERVICE_SID
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: TWILIO_TRIAL_TEMPLATE_BODY
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
+  - type: web
+    name: noq-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      # SPA — every deep link (e.g. /join/some-office) must still resolve
+      # to index.html and let react-router take over client-side, or a
+      # direct visit/refresh 404s.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_SOCKET_PATH
+        value: /socket.io
+      - key: VITE_DEMO_OFFICE_SLUG
+        value: ward-16-office-lalitpur
+      # Point these at the noq-backend URL Render gives you after its first
+      # deploy (e.g. https://noq-backend.onrender.com) — set here or in the
+      # dashboard, then trigger a redeploy of this service so the build
+      # picks them up (Vite env vars are baked in at build time).
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_SOCKET_URL
+        sync: false
+      # The frontend's own URL, once Render assigns it — used to build QR
+      # codes and join links. Set to this same service's URL.
+      - key: VITE_PUBLIC_URL
+        sync: false

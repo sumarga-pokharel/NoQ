@@ -47,11 +47,17 @@ function ServiceQr({ office, service }) {
           Join this line
         </Link>
       </div>
-      {dataUrl ? (
-        <img className="browse__qr" src={dataUrl} alt={`QR code for ${service.name}`} />
-      ) : (
-        <div className="browse__qr browse__qr--empty">QR unavailable</div>
-      )}
+      <div className="browse__qr-block">
+        {dataUrl ? (
+          <img className="browse__qr" src={dataUrl} alt={`QR code for ${service.name}`} />
+        ) : (
+          <div className="browse__qr browse__qr--empty">QR unavailable</div>
+        )}
+        <div className="browse__qr-caption">
+          <strong>{office.officeName}</strong>
+          <span>{service.name}</span>
+        </div>
+      </div>
     </div>
   )
 }
