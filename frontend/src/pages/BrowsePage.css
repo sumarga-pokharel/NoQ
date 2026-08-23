@@ -119,10 +119,36 @@
   margin: 4px 0 10px;
 }
 
+.browse__qr-block {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
 .browse__qr {
   width: 96px;
   height: 96px;
   border-radius: var(--radius-sm);
+}
+
+.browse__qr-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 11px;
+  text-align: center;
+  max-width: 110px;
+}
+
+.browse__qr-caption strong {
+  font-weight: 600;
+}
+
+.browse__qr-caption span {
+  color: var(--color-muted);
 }
 
 .browse__qr--empty {

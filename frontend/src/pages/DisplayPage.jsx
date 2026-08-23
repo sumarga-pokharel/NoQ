@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { api } from "../lib/api";
 import { useOfficeRealtime } from "../hooks/useOfficeRealtime";
 import AsyncState from "../components/AsyncState";
+import { PUBLIC_URL } from "../config/runtime";
 import "./DisplayPage.css";
 
 export default function DisplayPage() {
@@ -15,7 +16,7 @@ export default function DisplayPage() {
     searchParams.get("office") ||
     import.meta.env.VITE_DEMO_OFFICE_SLUG;
 
-  const joinUrl = `${window.location.origin}/join/${slug || ""}`;
+  const joinUrl = `${PUBLIC_URL}/join/${slug || ""}`;
 
   const [now, setNow] = useState(() => new Date());
   const [data, setData] = useState(null);
@@ -223,15 +224,18 @@ export default function DisplayPage() {
             <span>{joinUrl}</span>
           </div>
 
-          {qrDataUrl ? (
-            <img
-              className="board__scan-code"
-              src={qrDataUrl}
-              alt={`QR code to join the queue at ${data.office.officeName}`}
-            />
-          ) : (
-            <div className="board__scan-code" aria-hidden="true" />
-          )}
+          <div className="board__scan-qr-block">
+            {qrDataUrl ? (
+              <img
+                className="board__scan-code"
+                src={qrDataUrl}
+                alt={`QR code to join the queue at ${data.office.officeName}`}
+              />
+            ) : (
+              <div className="board__scan-code" aria-hidden="true" />
+            )}
+            <div className="board__scan-code-caption">{data.office.officeName}</div>
+          </div>
         </div>
       </div>
     </div>

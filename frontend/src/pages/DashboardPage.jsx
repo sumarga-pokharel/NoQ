@@ -5,6 +5,8 @@ import { useOfficeRealtime } from "../hooks/useOfficeRealtime";
 import QRCode from "qrcode";
 import FormError from "../components/FormError";
 import AsyncState from "../components/AsyncState";
+import { PUBLIC_URL } from "../config/runtime";
+import { composeQrPoster } from "../lib/qrPoster";
 import "./DashboardPage.css";
 
 const HOURS = [22, 48, 86, 100, 71, 34, 52, 63, 29, 14];
@@ -59,9 +61,10 @@ export default function DashboardPage() {
   const [walkInForm, setWalkInForm] = useState(null);
   const [notice, setNotice] = useState("");
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qrPosterUrl, setQrPosterUrl] = useState("");
   const [formError, setFormError] = useState(null);
 
-  const publicJoinUrl = `${window.location.origin}/join/${
+  const publicJoinUrl = `${PUBLIC_URL}/join/${
     provider?.slug || ""
   }`;
 
@@ -127,6 +130,29 @@ export default function DashboardPage() {
       active = false;
     };
   }, [provider?.slug, publicJoinUrl]);
+
+  // Composited separately from qrDataUrl above: the on-page <img> shows the
+  // plain code with an HTML caption for crisp, selectable text, but the
+  // downloaded file is a flat PNG, so the office name needs to be baked
+  // into the image itself to survive outside the app (e.g. on a printed
+  // poster).
+  useEffect(() => {
+    if (!qrDataUrl) {
+      setQrPosterUrl("");
+      return undefined;
+    }
+    let active = true;
+    composeQrPoster(qrDataUrl, [provider?.officeName])
+      .then((url) => {
+        if (active) setQrPosterUrl(url);
+      })
+      .catch(() => {
+        if (active) setQrPosterUrl("");
+      });
+    return () => {
+      active = false;
+    };
+  }, [qrDataUrl, provider?.officeName]);
 
   const setWaitingFilter = (name, value) => {
     setWaitingFilters((current) => ({
@@ -1787,6 +1813,8 @@ export default function DashboardPage() {
               )}
             </div>
 
+            <div className="dash__qr-caption">{provider.officeName}</div>
+
             <div className="dash__qr-url">
               {publicJoinUrl}
             </div>
@@ -1803,7 +1831,7 @@ export default function DashboardPage() {
               {qrDataUrl && (
                 <a
                   className="btn btn-primary btn-sm"
-                  href={qrDataUrl}
+                  href={qrPosterUrl || qrDataUrl}
                   download={`${provider.slug}-join-qr.png`}
                 >
                   Download PNG
