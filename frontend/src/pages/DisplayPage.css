@@ -223,5 +223,7 @@
   width: 8vw;
   height: 8vw;
   border-radius: 0.9vw;
-  background: repeating-linear-gradient(0deg, #123328 0 5px, transparent 5px 10px), repeating-linear-gradient(90deg, #123328 0 5px, #fff 5px 10px);
+  background: #fff;
+  padding: 0.4vw;
+  object-fit: contain;
 }

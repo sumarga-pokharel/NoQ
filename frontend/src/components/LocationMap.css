@@ -1,0 +1,39 @@
+.noq-map {
+  width: 100%;
+  height: 100%;
+  background: #eef1ee;
+}
+
+.noq-map--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  font-size: 12.5px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.noq-map .leaflet-control-attribution {
+  font-size: 9px;
+  padding: 0 4px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.noq-map-marker span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #fff;
+}
+
+.noq-map-marker--office span {
+  background: var(--color-green);
+  box-shadow: 0 2px 6px rgba(22, 32, 28, 0.35);
+}
+
+.noq-map-marker--visitor span {
+  background: var(--color-coral);
+  box-shadow: 0 0 0 4px rgba(228, 105, 74, 0.25);
+}

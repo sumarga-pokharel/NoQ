@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import QRCode from "qrcode";
 import { api } from "../lib/api";
 import { useOfficeRealtime } from "../hooks/useOfficeRealtime";
 import AsyncState from "../components/AsyncState";
@@ -14,9 +15,12 @@ export default function DisplayPage() {
     searchParams.get("office") ||
     import.meta.env.VITE_DEMO_OFFICE_SLUG;
 
+  const joinUrl = `${window.location.origin}/join/${slug || ""}`;
+
   const [now, setNow] = useState(() => new Date());
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
 
   const refresh = useCallback(() => {
     if (!slug) {
@@ -48,6 +52,22 @@ export default function DisplayPage() {
   }, [refresh]);
 
   useOfficeRealtime(data?.office?.id, refresh);
+
+  useEffect(() => {
+    if (!slug) return undefined;
+    let active = true;
+    QRCode.toDataURL(joinUrl, {
+      width: 320,
+      margin: 2,
+      errorCorrectionLevel: "M",
+      color: { dark: "#16201c", light: "#ffffff" },
+    })
+      .then((url) => active && setQrDataUrl(url))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [slug, joinUrl]);
 
   if (!data) {
     return (
@@ -200,15 +220,18 @@ export default function DisplayPage() {
           <div className="board__scan-text">
             फोनमा पालो हेर्नुहोस्
             <br />
-            <span>
-              {`${window.location.origin}/join/${slug}`}
-            </span>
+            <span>{joinUrl}</span>
           </div>
 
-          <div
-            className="board__scan-code"
-            aria-hidden="true"
-          />
+          {qrDataUrl ? (
+            <img
+              className="board__scan-code"
+              src={qrDataUrl}
+              alt={`QR code to join the queue at ${data.office.officeName}`}
+            />
+          ) : (
+            <div className="board__scan-code" aria-hidden="true" />
+          )}
         </div>
       </div>
     </div>

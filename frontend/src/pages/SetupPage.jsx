@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import QRCode from 'qrcode'
 import { useAuth } from '../context/AuthContext'
 import FormError from '../components/FormError'
 import './SetupPage.css'
@@ -28,6 +29,25 @@ export default function SetupPage() {
   const [newDoc, setNewDoc] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [qrDataUrl, setQrDataUrl] = useState('')
+
+  const publicJoinUrl = `${window.location.origin}/join/${provider?.slug || ''}`
+
+  useEffect(() => {
+    if (!provider?.slug) return undefined
+    let active = true
+    QRCode.toDataURL(publicJoinUrl, {
+      width: 320,
+      margin: 2,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#16201c', light: '#ffffff' },
+    })
+      .then((url) => active && setQrDataUrl(url))
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [provider?.slug, publicJoinUrl])
 
   const addService = () => {
     if (!newService.name.trim()) return
@@ -170,10 +190,18 @@ export default function SetupPage() {
             <h1>Publish your QR</h1>
             <p className="setup__lede">The link never expires — the poster stays on the wall and picks up whatever you publish.</p>
             <div className="setup__publish">
-              <div className="setup__qr" aria-hidden="true" />
+              {qrDataUrl ? (
+                <img
+                  className="setup__qr"
+                  src={qrDataUrl}
+                  alt={`QR code for ${provider?.officeName || 'your office'} queue`}
+                />
+              ) : (
+                <div className="setup__qr" aria-hidden="true" />
+              )}
               <div>
                 <div className="setup__publish-office">{provider?.officeName || 'Your office'}</div>
-                <div className="setup__publish-url">noq.com.np/{(provider?.officeName || 'your-office').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 18)}</div>
+                <div className="setup__publish-url">{publicJoinUrl}</div>
                 <div className="setup__publish-summary">
                   {services.length} service{services.length === 1 ? '' : 's'} · {docs.length} document{docs.length === 1 ? '' : 's'} required ·{' '}
                   {SECTORS.find((s) => s.id === sector)?.title}

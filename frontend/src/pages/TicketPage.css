@@ -124,14 +124,23 @@
 }
 
 .ticket__travel-map {
-  height: 110px;
-  background: repeating-linear-gradient(135deg, #e7ebe7 0 8px, #eff2ef 8px 16px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  color: #7c877f;
+  position: relative;
+  height: 180px;
+  background: #eef1ee;
+}
+
+.ticket__travel-map-badge {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 401;
+  padding: 6px 11px;
+  background: rgba(22, 32, 28, 0.85);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  pointer-events: none;
 }
 
 .ticket__travel-body {
@@ -287,7 +296,7 @@
   padding: 8px;
 }
 
-.ticket--left {
+.ticket--ended {
   align-items: center;
 }
 
@@ -295,6 +304,24 @@
   max-width: 420px;
   padding: 40px 32px;
   text-align: center;
+}
+
+.ticket__card-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--color-green-wash);
+  color: var(--color-green);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.ticket__card-icon--warn {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-fg-strong);
 }
 
 .ticket__card h1 {
