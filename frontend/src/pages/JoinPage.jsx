@@ -16,6 +16,7 @@ export default function JoinPage() {
   const [services, setServices] = useState([])
   const [step, setStep] = useState(1)
   const [serviceId, setServiceId] = useState('')
+  const [name, setName] = useState('')
   const [checked, setChecked] = useState(() => new Set())
   const [priority, setPriority] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState(getBrowserNotificationStatus)
@@ -90,6 +91,7 @@ export default function JoinPage() {
         method: 'POST',
         body: {
           serviceId,
+          name: name.trim(),
           priority,
           documents: docs.map((doc) => ({ name: doc.name, confirmed: checked.has(doc.name) })),
           phone: notifySms ? phone : '',
@@ -159,6 +161,7 @@ export default function JoinPage() {
           </>}
           {step === 2 && <>
             <h2>Bring these with you</h2>
+            <div className="field"><label htmlFor="visitorName">Your name (optional)</label><input id="visitorName" placeholder="e.g. Kamala Shrestha" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} /></div>
             <div className="join__docs">{docs.map((doc) => <label key={doc._id || doc.name} className="join__doc"><input type="checkbox" checked={checked.has(doc.name)} onChange={() => toggleDoc(doc.name)} />{doc.name}{doc.required === false && <span> (optional)</span>}</label>)}</div>
             <label className="join__toggle-row"><div><div className="join__toggle-title">Do you need priority?</div><div className="join__toggle-sub">Senior citizens, pregnant women and people with disability.</div></div><input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} /></label>
             <label className={`join__toggle-row join__notification-${notificationPermission}`}><div><div className="join__toggle-title">Notify me in this browser</div><div className="join__toggle-sub">{notificationMessage}</div></div><input type="checkbox" checked={notifyBrowser} disabled={notificationPermission === 'denied' || notificationPermission === 'unsupported'} onChange={(e) => toggleBrowserNotifications(e.target.checked)} /></label>

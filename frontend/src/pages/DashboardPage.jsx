@@ -221,6 +221,7 @@ export default function DashboardPage() {
 
     setWalkInForm({
       serviceId: firstActiveService._id,
+      name: "",
       priority: false,
     });
   };
@@ -783,6 +784,21 @@ export default function DashboardPage() {
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="field">
+            Visitor name (optional)
+            <input
+              value={walkInForm.name}
+              onChange={(event) =>
+                setWalkInForm((current) => ({
+                  ...current,
+                  name: event.target.value,
+                }))
+              }
+              maxLength={60}
+              placeholder="e.g. Kamala Shrestha"
+            />
           </label>
 
           <label className="dash__counter-active">
@@ -1640,7 +1656,7 @@ export default function DashboardPage() {
                   event.target.value,
                 )
               }
-              placeholder="Search token or phone"
+              placeholder="Search token, name or phone"
             />
 
             <select
@@ -1727,7 +1743,14 @@ export default function DashboardPage() {
                   </span>
 
                   <span>
-                    {ticket.phone || "Anonymous"}
+                    <div className="dash__waiting-name">
+                      {ticket.name || "Anonymous"}
+                    </div>
+                    {ticket.phone && (
+                      <div className="dash__waiting-phone">
+                        {ticket.phone}
+                      </div>
+                    )}
 
                     {ticket.priority && (
                       <div className="dash__waiting-tag">

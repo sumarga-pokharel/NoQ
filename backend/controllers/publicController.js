@@ -50,7 +50,7 @@ export const joinQueue = asyncHandler(async (req, res) => {
     throw new Error('This office has paused new joins right now');
   }
 
-  const { serviceId, priority, documents, phone, notifyBrowser, notifySms, pushSubscription } = req.body;
+  const { serviceId, priority, documents, name, phone, notifyBrowser, notifySms, pushSubscription } = req.body;
 
   const service = await Service.findOne({ _id: serviceId, provider: provider._id });
   if (!service) {
@@ -68,6 +68,14 @@ export const joinQueue = asyncHandler(async (req, res) => {
   }
   const normalizedPhone = notifySms ? normalizePhone(phone) : '';
 
+  const cleanName = String(name || '').trim().slice(0, 60);
+  if (name && !cleanName) {
+    res.status(400);
+    const error = new Error('Enter a name up to 60 characters, or leave it blank');
+    error.fields = { name: error.message };
+    throw error;
+  }
+
   const { token, sequence } = await nextToken(provider._id, service.prefix);
 
   const ticket = await Ticket.create({
@@ -78,6 +86,7 @@ export const joinQueue = asyncHandler(async (req, res) => {
     priority: !!priority,
     isEmergency: service.isEmergency,
     documents: documents || [],
+    name: cleanName,
     phone: normalizedPhone,
     notifyBrowser: !!notifyBrowser,
     notifySms: !!notifySms,

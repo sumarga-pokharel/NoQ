@@ -92,6 +92,15 @@ textarea {
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
+  /* Buttons rendered as <a>/<Link> must not inherit the global anchor
+     hover style below — text-decoration: underline plus a hover color
+     that (for .btn-primary) lands almost on top of its own hover
+     background, making the label unreadable on hover. */
+  text-decoration: none;
+}
+
+.btn:hover {
+  text-decoration: none;
 }
 
 .btn-primary {
@@ -101,6 +110,7 @@ textarea {
 
 .btn-primary:hover {
   background: var(--color-green-dark);
+  color: #fff;
 }
 
 .btn-secondary {
@@ -111,6 +121,7 @@ textarea {
 
 .btn-secondary:hover {
   border-color: var(--color-green);
+  color: var(--color-green);
 }
 
 .btn-ghost {
@@ -120,6 +131,7 @@ textarea {
 
 .btn-ghost:hover {
   background: #edefec;
+  color: var(--color-body);
 }
 
 .btn-danger-outline {
@@ -130,6 +142,7 @@ textarea {
 
 .btn-danger-outline:hover {
   border-color: var(--color-alert-fg);
+  color: var(--color-alert-fg);
 }
 
 .btn:disabled {

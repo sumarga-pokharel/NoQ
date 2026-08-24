@@ -28,6 +28,7 @@ const ticketSchema = new mongoose.Schema(
     ],
 
     // Consumer contact - no account required
+    name: { type: String, trim: true, default: '' },
     phone: { type: String, trim: true, default: '' },
     notifyBrowser: { type: Boolean, default: false },
     notifySms: { type: Boolean, default: false },

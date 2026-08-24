@@ -62,7 +62,7 @@ export const getWaitingTickets = asyncHandler(async (req, res) => {
   if (req.query.priority === 'regular') query.priority = false;
   if (req.query.search?.trim()) {
     const search = new RegExp(escapeRegExp(req.query.search.trim().slice(0, 60)), 'i');
-    query.$or = [{ token: search }, { phone: search }];
+    query.$or = [{ token: search }, { phone: search }, { name: search }];
   }
 
   const total = await Ticket.countDocuments(query);
@@ -81,7 +81,7 @@ export const getWaitingTickets = asyncHandler(async (req, res) => {
 // @desc  Staff manually issues a token for a walk-in visitor
 // @route POST /api/tickets/walk-in
 export const createWalkIn = asyncHandler(async (req, res) => {
-  const { serviceId, priority } = req.body;
+  const { serviceId, priority, name } = req.body;
 
   if (!serviceId) {
     res.status(400);
@@ -106,6 +106,7 @@ export const createWalkIn = asyncHandler(async (req, res) => {
     priority: !!priority,
     isEmergency: service.isEmergency,
     documents: (req.provider.requiredDocuments || []).map((d) => ({ name: d.name, confirmed: true })),
+    name: String(name || '').trim().slice(0, 60),
   });
 
   const snapshot = await buildDashboardSnapshot(req.provider._id);
