@@ -1,5 +1,9 @@
 # NoQ
 
+**Live demo:** [noq-queue.onrender.com](https://noq-queue.onrender.com/)
+> Hosted on Render's free tier — the backend spins down when idle, so the
+> first load after a while can take up to a minute to wake up.
+
 Virtual queue management for places in Nepal where people still stand in line —
 government offices, hospitals, banks, and anywhere else that hands out a
 token number. Visitors join a queue from their phone (no app, no account),
@@ -117,12 +121,12 @@ pnpm test
 
 ## Deployment
 
-`render.yaml` deploys the backend as a web service and the frontend as a
-static site on [Render](https://render.com), including the SPA rewrite rule
-the frontend needs and the env vars each service expects. Backend and
-frontend can also be deployed separately behind a reverse proxy — see the
-"Production API and Socket.IO configuration" section in `backend/SETUP.md`
-for both layouts.
+Deployed on [Render](https://render.com) using the `render.yaml` blueprint in
+this repo — one web service for the backend, one static site for the
+frontend, including the SPA rewrite rule the frontend needs and the env vars
+each service expects. Backend and frontend can also be deployed separately
+behind a reverse proxy — see the "Production API and Socket.IO configuration"
+section in `backend/SETUP.md` for both layouts.
 
 ## Status
 
