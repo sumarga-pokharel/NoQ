@@ -15,6 +15,18 @@ counters.
 Built with Nepal's connectivity in mind: SMS fallback for visitors without
 data, offline-tolerant ticket pages, and Nepali/English throughout.
 
+## Contents
+
+- [Why](#why)
+- [How it works](#how-it-works)
+- [Features](#features)
+- [Stack](#stack)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Deployment](#deployment)
+- [Status](#status)
+- [License](#license)
+
 ## Why
 
 Queue tokens exist mostly to make people physically wait near the counter so
@@ -86,19 +98,34 @@ NoQ/
 ## Getting started
 
 Requires Node 18+ and a MongoDB Atlas connection string (a free M0 cluster is
-enough to develop against).
+enough to develop against). Full setup — Atlas walkthrough, every env var,
+the public/staff API reference, and Socket.io usage — lives in
+[`backend/SETUP.md`](backend/SETUP.md); the steps below are the fast path.
 
 ```bash
 # backend
 cd backend
 npm install
-cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, CLIENT_ORIGIN
+cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, CLIENT_ORIGIN, and
+                        # any provider keys (Twilio, Google Routes, SMTP) —
+                        # see SETUP.md for the full list and what breaks
+                        # without each one
 npm run dev
+```
 
+```bash
 # frontend, in another terminal
 cd frontend
 npm install
+cp .env.example .env   # set VITE_API_URL to your backend's address
 npm run dev
+```
+
+To build the frontend for production:
+
+```bash
+cd frontend
+npm run build
 ```
 
 Seed a demo office (with sample services, counters, and a join link) with:
@@ -108,15 +135,12 @@ cd backend
 npm run seed
 ```
 
-Full setup instructions — Atlas setup, env vars, the public/staff API
-reference, and Socket.io usage — are in [`backend/SETUP.md`](backend/SETUP.md).
-
 Run the backend's integration test suite (spins up an in-memory MongoDB, no
 effect on real data) with:
 
 ```bash
 cd backend
-pnpm test
+npm test
 ```
 
 ## Deployment
@@ -125,13 +149,18 @@ Deployed on [Render](https://render.com) using the `render.yaml` blueprint in
 this repo — one web service for the backend, one static site for the
 frontend, including the SPA rewrite rule the frontend needs and the env vars
 each service expects. Backend and frontend can also be deployed separately
-behind a reverse proxy — see the "Production API and Socket.IO configuration"
-section in `backend/SETUP.md` for both layouts.
+behind a reverse proxy — see "Production API and Socket.IO configuration" in
+`backend/SETUP.md` for both layouts.
 
 ## Status
 
 Backend API and realtime layer are functional and tested. Frontend pages are
-built against the same API but some screens still use local/mock state where
+built against the same API, but some screens still use local/mock state where
 noted in `backend/SETUP.md` — that file also lists what's stubbed (push
 notification delivery, SMS/email providers without credentials configured)
 versus what's wired end-to-end.
+
+## License
+
+<!-- e.g. MIT, or "No license yet — all rights reserved" if intentional -->
+TBD
